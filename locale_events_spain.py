@@ -3,10 +3,7 @@
 #Para ello necesitas autentificarte con la API key.
 # Esta API utiliza la respuesta json.
 
-# Importante!!
-# Si queremos subir este programa a github, debería buscar algún mecanismo para no guardar nuestra key en el repositorio público de github.
-# Para ello vamos a usar variables de entorno.
-
+#Vamos a usar variables de entorno para guardar nuestra key.
 # Deremos exportar la clave de nuestra cuenta en una variable de entorno desde la terminal:
 # export key ="**************************"
 
@@ -22,6 +19,7 @@ url_base="https://app.ticketmaster.com/discovery/v2/"
 
 #En una variable key, guardamos por el diccionario os.environ nuestra key
 key=os.environ["apikey"]
+#Guardamos en una variable el código del país, en esta caso España
 code='ES'
 #Vamos a crear un diccionario que guarde nuestros parámetros
 payload = {'apikey':key,'countryCode':code}
@@ -30,6 +28,7 @@ payload = {'apikey':key,'countryCode':code}
 r=requests.get(url_base+'venues.json',params=payload)
 
 #Para asegurarnos que no hay errores consultamos el estado de la petición.
+#Inicializamos las listas que nos hacen falta
 salas=[]
 lugares=[]
 if r.status_code == 200:
