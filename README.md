@@ -8,7 +8,6 @@ Sería muy interesante que buscaras una API (o APIs) de algún tema que te inter
 
 > En este caso estamos usando: TICKETMASTER API -> https://developer.ticketmaster.com/
 
-### PARTE 1
+###### PARTE 1:Debes entregar al menos tres programas python que realicen peticiones a la API (o APIs) que vayas a utilizar en la práctica.
 
-- Debes entregar al menos tres programas python que realicen peticiones a la API (o APIs) que vayas a utilizar en la práctica.
-
+- Programa en python que muestra la sala, el lugar y los artistas que van a actuar proximamente en España con las fechas indicadas. (ok)
