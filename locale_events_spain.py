@@ -33,7 +33,7 @@ r=requests.get(url_base+'venues.json',params=payload)
 
 #Función que recibe un identificador del lugar y devuelve el nombre del evento y la fecha en la que está previsto.
 
-def mostrar_nombre_evento (id_lugar):
+def mostrar_artista_fecha (id_lugar):
     parametros = {'apikey':key,'venueId':id_lugar}
     peticion=requests.get(url_base+'events',params=parametros)
     nombres=[]
@@ -60,13 +60,13 @@ if r.status_code == 200:
         lugares.append(lugar["state"]["name"])
         identificadores.append(lugar["id"])
     filtro=[salas,lugares,identificadores]
-    
+    #Mostramos la sala y el lugar donde se encuentra. Segun el identificador del lugar muestra el nombre del artista y la fecha en la que actúa.
     for sala,lugar,ident in zip(filtro[0],filtro[1],filtro[2]):
-        if mostrar_nombre_evento(ident):
+        if mostrar_artista_fecha(ident):
             print()
             print("\nLUGAR: ",lugar,"\nSALA:",sala)
             print("\nArtistas que van a tocar en la sala proximamente:")
-            for nom,fecha in zip(mostrar_nombre_evento(ident)[0],mostrar_nombre_evento(ident)[1]):
+            for nom,fecha in zip(mostrar_artista_fecha(ident)[0],mostrar_artista_fecha(ident)[1]):
                 fecha_cambiada = datetime.strptime(fecha, '%Y-%m-%d')
                 fecha_str = datetime.strftime(fecha_cambiada, '%d/%m/%Y')
                 print("- ",nom,"Fecha: ",fecha_str)        
