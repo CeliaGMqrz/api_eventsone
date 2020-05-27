@@ -66,7 +66,7 @@ if r.status_code == 200:
             print()
             print("\nLUGAR: ",lugar,"\nSALA:",sala)
             print("\nArtistas que van a tocar en la sala proximamente:")
-            for nom,fecha in zip(mostrar_artista_fecha(ident)[0],mostrar_artista_fecha(ident)[1]):
+            for nom,fecha in zip((mostrar_artista_fecha(ident)[0]),(mostrar_artista_fecha(ident)[1])):
                 fecha_cambiada = datetime.strptime(fecha, '%Y-%m-%d')
                 fecha_str = datetime.strftime(fecha_cambiada, '%d/%m/%Y')
                 print("- ",nom,"Fecha: ",fecha_str)        
