@@ -33,7 +33,7 @@ if p.status_code == 200:
         total_paginas=doc["page"].get("totalPages")
 
     
-#Obtener la lista de codigos de paises, sacada de SUPPORTED COUNTRY CODES
+#Obtener la lista de codigos de paises, sacada de SUPPORTED COUNTRY CODES ("Esta lista la podemos leer en un fichero aparte si queremos")
 
 codigos_paises=["US (United States Of America)",
 "AD (Andorra)",
@@ -162,10 +162,10 @@ def mostrar_evento (codigo_pais):
             filtro=[nombres,fechas,horas,salas,direccion,ciudades,urls]
             return filtro
 
-
+#Pedimos al usuario el código del país
 codpais=input("\nIntroduce el código del pais: ")
+#Guardamos los códigos recortados en una lista
 codigos=[]
-
 for i in codigos_paises:
     codigos.append(i[:2])
 
@@ -187,8 +187,10 @@ while codpais not in codigos:
         codpais=input("\nIntroduce el código del pais: ")
 
 #MOSTRAR CONTENIDO
+#Si lo que devuelve la funcion no es una lista imprime el mensaje.
 if type(mostrar_evento(codpais)) != list: 
     print(mostrar_evento(codpais))
+#Si no, impime el contenido
 else:
     for nombre,fecha,hora,sala,direc,ciudad,url in zip((mostrar_evento(codpais)[0]),(mostrar_evento(codpais)[1]),(mostrar_evento(codpais)[2]),(mostrar_evento(codpais)[3]),(mostrar_evento(codpais)[4]),(mostrar_evento(codpais)[5]),(mostrar_evento(codpais)[6])):
         fecha_cambiada = datetime.strptime(fecha, '%Y-%m-%d')
