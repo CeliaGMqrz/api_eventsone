@@ -23,8 +23,105 @@ url_base="https://app.ticketmaster.com/discovery/v2/"
 #En una variable key, guardamos por el diccionario os.environ nuestra key
 key=os.environ["apikey"]
 
-#Función que recibe el código del país y devuelve el nombre, la sala, la dirección, la fecha y la url
 
+#Obtener el total de páginas:
+payload = {'apikey':key}
+p = requests.get(url_base+'events',params=payload)
+if p.status_code == 200:
+    doc = p.json()
+    if doc["page"]:
+        total_paginas=doc["page"].get("totalPages")
+
+    
+#Obtener la lista de codigos de paises, sacada de SUPPORTED COUNTRY CODES
+
+codigos_paises=["US (United States Of America)",
+"AD (Andorra)",
+"AI (Anguilla)",
+"AR (Argentina)",
+"AU (Australia)",
+"AT (Austria)",
+"AZ (Azerbaijan)",
+"BS (Bahamas)",
+"BH (Bahrain)",
+"BB (Barbados)",
+"BE (Belgium)",
+"BM (Bermuda)",
+"BR (Brazil)",
+"BG (Bulgaria)",
+"CA (Canada)",
+"CL (Chile)",
+"CN (China)",
+"CO (Colombia)",
+"CR (Costa Rica)",
+"HR (Croatia)",
+"CY (Cyprus)",
+"CZ (Czech Republic)",
+"DK (Denmark)",
+"DO (Dominican Republic)",
+"EC (Ecuador)",
+"EE (Estonia)",
+"FO (Faroe Islands)",
+"FI (Finland)",
+"FR (France)",
+"GE (Georgia)",
+"DE (Germany)",
+"GH (Ghana)",
+"GI (Gibraltar)",
+"GB (Great Britain)",
+"GR (Greece)",
+"HK (Hong Kong)",
+"HU (Hungary)",
+"IS (Iceland)",
+"IN (India)",
+"IE (Ireland)",
+"IL (Israel)",
+"IT (Italy)",
+"JM (Jamaica)",
+"JP (Japan)",
+"KR (Korea, Republic of)",
+"LV (Latvia)",
+"LB (Lebanon)",
+"LT (Lithuania)",
+"LU (Luxembourg)",
+"MY (Malaysia)",
+"MT (Malta)",
+"MX (Mexico)",
+"MC (Monaco)",
+"ME (Montenegro)",
+"MA (Morocco)",
+"NL (Netherlands)",
+"AN (Netherlands Antilles)",
+"NZ (New Zealand)",
+"ND (Northern Ireland)",
+"NO (Norway)",
+"PE (Peru)",
+"PL (Poland)",
+"PT (Portugal)",
+"RO (Romania)",
+"RU (Russian Federation)",
+"LC (Saint Lucia)",
+"SA (Saudi Arabia)",
+"RS (Serbia)",
+"SG (Singapore)",
+"SK (Slovakia)",
+"SI (Slovenia)",
+"ZA (South Africa)",
+"ES (Spain)",
+"SE (Sweden)",
+"CH (Switzerland)",
+"TW (Taiwan)",
+"TH (Thailand)",
+"TT (Trinidad and Tobago)",
+"TR (Turkey)",
+"UA (Ukraine)",
+"AE (United Arab Emirates)",
+"UY (Uruguay)",
+"VE (Venezuela)"]
+
+
+
+#Función que recibe el código del país y devuelve el nombre, la sala, la dirección, la fecha y la url
 def mostrar_evento (codigo_pais):
     #Creamos el diccionario con los parámetros necesarios
     payload = {'apikey':key,'countryCode':codigo_pais}
@@ -40,22 +137,61 @@ def mostrar_evento (codigo_pais):
     urls=[]
     #Comprobamos que la peticion es correcta
     if r.status_code == 200:
+        url_gestionada=r.url
         #Guardamos el contenido en json
         contenido = r.json()
-        #Añadimos la información a cada lista
-        for elem in contenido["_embedded"]["events"]:
-            nombres.append(elem["name"])
-            urls.append(elem["url"])
-            fechas.append(elem["dates"]["start"]["localDate"])
-            horas.append(elem["dates"]["start"]["localTime"])
-            salas.append(elem["_embedded"]["venues"][0]["name"])
-            direccion.append(elem["_embedded"]["venues"][0]["address"]["line1"])
-            ciudades.append(elem["_embedded"]["venues"][0]["state"]["name"])
-        filtro=[nombres,fechas,horas,salas,direccion,ciudades,urls]
-        return filtro 
+        # Si el total de elementos es igual a 0 devuelve un mensaje
+        total_pag=contenido["page"].get("totalElements")
+        if total_pag == 0:
+            mensaje=("No hay eventos en el país indicado")
+            return mensaje
+        else:
+            #Añadimos la información a cada lista
+            for elem in contenido["_embedded"]["events"]:
+                nombres.append(elem["name"])
+                urls.append(elem["url"])
+                fechas.append(elem["dates"]["start"]["localDate"])
+                #A veces la hora no esta especificada así que nos aseguramos de ello.
+                if "localTime" in elem["dates"]["start"]:
+                    horas.append(elem["dates"]["start"]["localTime"])
+                else:
+                    horas.append("NO ESPECIFICADA")
+                salas.append(elem["_embedded"]["venues"][0]["name"])
+                direccion.append(elem["_embedded"]["venues"][0]["address"]["line1"])
+                ciudades.append(elem["_embedded"]["venues"][0]["city"]["name"])
+            filtro=[nombres,fechas,horas,salas,direccion,ciudades,urls]
+            return filtro
 
-codpais=input("Introduce el código del pais: ")
-for nombre,fecha,hora,sala,direc,ciudad,url in zip((mostrar_evento(codpais)[0]),(mostrar_evento(codpais)[1]),(mostrar_evento(codpais)[2]),(mostrar_evento(codpais)[3]),(mostrar_evento(codpais)[4]),(mostrar_evento(codpais)[5]),(mostrar_evento(codpais)[6])):
-    fecha_cambiada = datetime.strptime(fecha, '%Y-%m-%d')
-    fecha_str = datetime.strftime(fecha_cambiada, '%d/%m/%Y')
-    print("\n\nNOMBRE:",nombre,"\nURL COMPRAR ENTRADA:",url,"\nFECHA:",fecha_str,"\nHORA:",hora,"\nSALA:",sala,"\nDIRECCIÓN:",direc,"\nCIUDAD:",ciudad) 
+
+codpais=input("\nIntroduce el código del pais: ")
+codigos=[]
+
+for i in codigos_paises:
+    codigos.append(i[:2])
+
+#Validar codigo pais
+while codpais not in codigos:
+    print("\n¡Error!")
+    print("\n-> El Código del país no es correcto.")
+    print("\n-> El Código se compone de dos caracteres en mayúsculas")
+    respuesta=input("\n¿Quieres ver las lista de códigos disponible?"'(s/n): ')
+    #Validar respuesta
+    if 's' not in respuesta and 'n' not in respuesta:
+        print("\nPorfavor introduce s o n para responder")
+        respuesta=input("\n¿Quieres ver las lista de códigos disponible?"'(s/n): ')
+    elif respuesta == 's':
+        for elem in codigos_paises:
+            print(elem)
+        codpais=input("\nIntroduce el código del pais: ")
+    else:
+        codpais=input("\nIntroduce el código del pais: ")
+
+#MOSTRAR CONTENIDO
+if type(mostrar_evento(codpais)) != list: 
+    print(mostrar_evento(codpais))
+else:
+    for nombre,fecha,hora,sala,direc,ciudad,url in zip((mostrar_evento(codpais)[0]),(mostrar_evento(codpais)[1]),(mostrar_evento(codpais)[2]),(mostrar_evento(codpais)[3]),(mostrar_evento(codpais)[4]),(mostrar_evento(codpais)[5]),(mostrar_evento(codpais)[6])):
+        fecha_cambiada = datetime.strptime(fecha, '%Y-%m-%d')
+        fecha_str = datetime.strftime(fecha_cambiada, '%d/%m/%Y')
+        print("\n\nNOMBRE:",nombre,"\nURL COMPRAR ENTRADA:",url,"\nFECHA:",fecha_str,"\nHORA:",hora,"\nSALA:",sala,"\nDIRECCIÓN:",direc,"\nCIUDAD:",ciudad)
+       
