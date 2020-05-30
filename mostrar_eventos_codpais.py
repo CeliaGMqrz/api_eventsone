@@ -122,9 +122,9 @@ codigos_paises=["US (United States Of America)",
 
 
 #Función que recibe el código del país y devuelve el nombre, la sala, la dirección, la fecha y la url
-def mostrar_evento (codigo_pais):
+def mostrar_evento (codigo_pais,numero_pagina):
     #Creamos el diccionario con los parámetros necesarios
-    payload = {'apikey':key,'countryCode':codigo_pais}
+    payload = {'apikey':key,'countryCode':codigo_pais,'page':numero_pagina}
     #Guardamos la petición en una variable(urlbase + diccionario con parametros)
     r=requests.get(url_base+'events',params=payload)
     #Inicializamos las listas necesarias
@@ -157,43 +157,64 @@ def mostrar_evento (codigo_pais):
                 else:
                     horas.append("NO ESPECIFICADA")
                 salas.append(elem["_embedded"]["venues"][0]["name"])
-                direccion.append(elem["_embedded"]["venues"][0]["address"]["line1"])
+                if "address" in elem["_embedded"]["venues"][0]:
+                    direccion.append(elem["_embedded"]["venues"][0]["address"]["line1"])
+                else:
+                    direccion.append("NO ESPECIFICADA")
                 ciudades.append(elem["_embedded"]["venues"][0]["city"]["name"])
             filtro=[nombres,fechas,horas,salas,direccion,ciudades,urls]
             return filtro
 
-#Pedimos al usuario el código del país
-codpais=input("\nIntroduce el código del pais: ")
-#Guardamos los códigos recortados en una lista
-codigos=[]
-for i in codigos_paises:
-    codigos.append(i[:2])
-
-#Validar codigo pais
-while codpais not in codigos:
-    print("\n¡Error!")
-    print("\n-> El Código del país no es correcto.")
-    print("\n-> El Código se compone de dos caracteres en mayúsculas")
-    respuesta=input("\n¿Quieres ver las lista de códigos disponible?"'(s/n): ')
-    #Validar respuesta
-    if 's' not in respuesta and 'n' not in respuesta:
-        print("\nPorfavor introduce s o n para responder")
-        respuesta=input("\n¿Quieres ver las lista de códigos disponible?"'(s/n): ')
-    elif respuesta == 's':
-        for elem in codigos_paises:
-            print(elem)
+#Inicializamos las variables codigo de pais vacío y numero por defecto en 1, para que sea la primera página del contenido
+codpais=""
+num=1
+#Mientras numero de pagina sea distinto de * hacemos todo el procedimiento
+while num != 0:
+    #Pedimos al usuario el código del país
+    if codpais == "":
         codpais=input("\nIntroduce el código del pais: ")
     else:
-        codpais=input("\nIntroduce el código del pais: ")
+        None
+    #Guardamos los códigos recortados en una lista
+    codigos=[]
+    for i in codigos_paises:
+        codigos.append(i[:2])
 
-#MOSTRAR CONTENIDO
-#Si lo que devuelve la funcion no es una lista imprime el mensaje.
-if type(mostrar_evento(codpais)) != list: 
-    print(mostrar_evento(codpais))
-#Si no, impime el contenido
-else:
-    for nombre,fecha,hora,sala,direc,ciudad,url in zip((mostrar_evento(codpais)[0]),(mostrar_evento(codpais)[1]),(mostrar_evento(codpais)[2]),(mostrar_evento(codpais)[3]),(mostrar_evento(codpais)[4]),(mostrar_evento(codpais)[5]),(mostrar_evento(codpais)[6])):
-        fecha_cambiada = datetime.strptime(fecha, '%Y-%m-%d')
-        fecha_str = datetime.strftime(fecha_cambiada, '%d/%m/%Y')
-        print("\n\nNOMBRE:",nombre,"\nURL COMPRAR ENTRADA:",url,"\nFECHA:",fecha_str,"\nHORA:",hora,"\nSALA:",sala,"\nDIRECCIÓN:",direc,"\nCIUDAD:",ciudad)
-       
+    #Validar codigo pais
+    while codpais not in codigos:
+        print("\n¡Error!")
+        print("\n-> El Código del país no es correcto.")
+        print("\n-> El Código se compone de dos caracteres en mayúsculas")
+        respuesta=input("\n¿Quieres ver las lista de códigos disponible?"'(s/n): ')
+        #Validar respuesta
+        if 's' not in respuesta and 'n' not in respuesta:
+            print("\nPorfavor introduce s o n para responder")
+            respuesta=input("\n¿Quieres ver las lista de códigos disponible?"'(s/n): ')
+        elif respuesta == 's':
+            for elem in codigos_paises:
+                print(elem)
+            codpais=input("\nIntroduce el código del pais: ")
+        else:
+            codpais=input("\nIntroduce el código del pais: ")
+
+    #MOSTRAR CONTENIDO
+    #Si lo que devuelve la funcion no es una lista imprime el mensaje.
+    if type(mostrar_evento(codpais,num)) != list: 
+        print(mostrar_evento(codpais,num))
+        print("Programa terminado.")
+        break
+    #Si no, impime el contenido
+    else:
+        for nombre,fecha,hora,sala,direc,ciudad,url in zip((mostrar_evento(codpais,num)[0]),(mostrar_evento(codpais,num)[1]),(mostrar_evento(codpais,num)[2]),(mostrar_evento(codpais,num)[3]),(mostrar_evento(codpais,num)[4]),(mostrar_evento(codpais,num)[5]),(mostrar_evento(codpais,num)[6])):
+            fecha_cambiada = datetime.strptime(fecha, '%Y-%m-%d')
+            fecha_str = datetime.strftime(fecha_cambiada, '%d/%m/%Y')
+            print("\n\nNOMBRE:",nombre,"\nURL COMPRAR ENTRADA:",url,"\nFECHA:",fecha_str,"\nHORA:",hora,"\nSALA:",sala,"\nDIRECCIÓN:",direc,"\nCIUDAD:",ciudad)
+    siguiente_pagina=input("¿Quieres ir a la siguiente página?(S/N)")
+    if siguiente_pagina.upper() == 'S':
+        num = num + 1
+    else:
+        print("Programa terminado.")
+        break
+
+
+#while para las paginas
