@@ -210,6 +210,7 @@ while num != 0:
             fecha_str = datetime.strftime(fecha_cambiada, '%d/%m/%Y')
             print("\n\nNOMBRE:",nombre,"\nURL COMPRAR ENTRADA:",url,"\nFECHA:",fecha_str,"\nHORA:",hora,"\nSALA:",sala,"\nDIRECCIÓN:",direc,"\nCIUDAD:",ciudad)
     siguiente_pagina=input("¿Quieres ir a la siguiente página?(S/N)")
+    #Si el usuario indica s, incrementamos el número de página en uno para pasar de página. Esta variable se le indica a la función para que incremente la página.
     if siguiente_pagina.upper() == 'S':
         num = num + 1
     else:
