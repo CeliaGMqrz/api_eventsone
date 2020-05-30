@@ -1,4 +1,4 @@
-#Programa en python que muestra todos los eventos segun código del pais, con el artista o los artistas, la fecha, el lugar y la url para comprar la entrada
+#Programa en python que muestra los eventos internacionales según la palabra clave (artista) que introduzca el usuario. 
 
 #Para ello necesitas autentificarte con la API key.
 # Esta API utiliza la respuesta json.
